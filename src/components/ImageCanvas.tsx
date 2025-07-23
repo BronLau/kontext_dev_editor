@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Download, Loader2 } from 'lucide-react';
+import { Download, Loader2, X } from 'lucide-react';
 import { useAppStore, useCurrentImage, useIsProcessing, useHistory } from '../store/useAppStore';
 import { validateImageFile, fileToURL, getImageDimensions, downloadImage } from '../utils/imageUtils';
 import { ImageInfo } from '../types';
@@ -90,6 +90,18 @@ const ImageCanvas: React.FC = () => {
     }
   }, [currentImage]);
 
+  // 删除当前图片
+  const handleDeleteImage = useCallback(() => {
+    // 清除当前图片，返回到上传界面
+    setCurrentImage(null);
+    clearError();
+    
+    // 重置文件输入框
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  }, [setCurrentImage, clearError]);
+
   // 计算正确的版本号
   // v1应该是第一次编辑的图片，v2、v3等是后续版本
   let version = history.length + 1;
@@ -174,6 +186,20 @@ const ImageCanvas: React.FC = () => {
           <div className="absolute bottom-3 left-4 sm:bottom-4 sm:left-6 text-xs bg-black/60 text-white w-6 h-6 flex items-center justify-center rounded">
             v{version}
           </div>
+
+          {/* 容器右上角的删除按钮 */}
+          {!isProcessing && (
+            <button
+              onClick={handleDeleteImage}
+              className="absolute top-4 right-4 bg-gray-700 hover:bg-gray-600 
+                        text-gray-300 hover:text-white p-2 rounded-lg 
+                        transition-all duration-200 shadow-lg
+                        hover:scale-105"
+              title="删除图片并重新上传"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
 
           {/* 容器右下角的下载按钮 */}
           {!isProcessing && (
